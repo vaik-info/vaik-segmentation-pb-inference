@@ -70,7 +70,7 @@ class PbModel:
             arg_max_pred = np.argmax(pred[index], -1)
             arg_max_pred = arg_max_pred[:resize_image_shape_list[index][0], :resize_image_shape_list[index][1]]
             arg_max_pred_image = Image.fromarray(arg_max_pred.astype(np.uint8))
-            arg_max_pred_image = arg_max_pred_image.resize((input_image_shape_list[index][1], input_image_shape_list[index][0]), resample=Image.BILINEAR)
+            arg_max_pred_image = arg_max_pred_image.resize((input_image_shape_list[index][1], input_image_shape_list[index][0]), resample=Image.NEAREST)
             arg_max_array = np.asarray(arg_max_pred_image)
             output_dict = {'labels': arg_max_array}
             output_dict_list.append(output_dict)
