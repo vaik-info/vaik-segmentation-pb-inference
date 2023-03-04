@@ -2,7 +2,6 @@ from typing import List, Dict, Tuple
 import tensorflow as tf
 from PIL import Image
 import numpy as np
-from skimage.transform import resize
 
 class PbModel:
     def __init__(self, input_saved_model_dir_path: str = None, classes: Tuple = None):
@@ -68,8 +67,11 @@ class PbModel:
     def __output_parse(self, pred: np.ndarray, resize_image_shape_list: List[Tuple], input_image_shape_list: List[Tuple]) -> List[Dict]:
         output_dict_list = []
         for index in range(pred.shape[0]):
-            crop_pred = pred[index][:resize_image_shape_list[index][0], :resize_image_shape_list[index][1]]
-            resize_pred = resize(crop_pred, (input_image_shape_list[index]))
-            output_dict = {'labels': np.argmax(resize_pred, -1)}
+            arg_max_pred = np.argmax(pred[index], -1)
+            arg_max_pred = arg_max_pred[:resize_image_shape_list[index][0], :resize_image_shape_list[index][1]]
+            arg_max_pred_image = Image.fromarray(arg_max_pred.astype(np.uint8))
+            arg_max_pred_image = arg_max_pred_image.resize((input_image_shape_list[index][1], input_image_shape_list[index][0]), resample=Image.BILINEAR)
+            arg_max_array = np.asarray(arg_max_pred_image)
+            output_dict = {'labels': arg_max_array}
             output_dict_list.append(output_dict)
         return output_dict_list
